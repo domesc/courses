@@ -1,0 +1,67 @@
+---
+title: "Statistical Inference Course Project Part 2"
+author: "domesc"
+date: "June 16, 2015"
+output: pdf_document
+---
+
+### Assignment
+Now in the second portion of the class, we're going to analyze the ToothGrowth data in the R datasets package.
+
+### 1.Load the ToothGrowth data and perform some basic exploratory data analyses
+We load first the data and we look at the variable types through str function:
+```{r}
+data("ToothGrowth")
+str(ToothGrowth)
+```
+We have 2 numerical columns "len" and "dose" and a factor variable "supp". To have more information on the
+data set:
+```{r}
+head(ToothGrowth)
+help("ToothGrowth")
+summary(ToothGrowth)
+```
+
+### 2.Provide a basic summary of the data
+```{r}
+library(ggplot2)
+plot <- ggplot(data = ToothGrowth, aes(x=ToothGrowth$dose, y = ToothGrowth$len))+
+  ggtitle("Scatterplots by supplement type") +
+  xlab("Dose in milligrams") +
+  ylab("Tooth length") +
+  geom_point(color = 'black', fill = 'white') +
+  facet_wrap(~supp)
+plot
+```
+
+### 3.Use confidence intervals and/or hypothesis tests to compare tooth growth by supp and dose. (Only use the techniques from class, even if there's other approaches worth considering)
+
+First of all we use the t.test to check if the difference of Vitamin C supplement type influence the tooth growth. We do this by looking at the p value:
+```{r}
+t.test(ToothGrowth$len[ToothGrowth$supp=="OJ"], 
+       ToothGrowth$len[ToothGrowth$supp=="VC"], 
+       paired = FALSE, 
+       var.equal = FALSE)
+```
+In this case it is not < 0.05, so we cannot reject the null hypothesis and we can conclude that there is no evidence for a correlation between supplement type and tooth growth.
+
+We now check if the dose can influence tooth growth always by looking at the p value:
+```{r}
+t.test(ToothGrowth$len[ToothGrowth$dose==2], 
+       ToothGrowth$len[ToothGrowth$dose==1], 
+       paired = FALSE, 
+       var.equal = TRUE)
+```
+this time since the p value is <0.05 we have enough evidence to reject the null hypothesis. This means that there is a correlation between a dose change from 1 to 2 mg and the tooth growth.
+
+```{r}
+t.test(ToothGrowth$len[ToothGrowth$dose==1], 
+       ToothGrowth$len[ToothGrowth$dose==0.5], 
+       paired = FALSE, 
+       var.equal = TRUE)
+```
+The confidence interval does not contain zero. There is no need to compare the dosage of 0.5 and 2 mg.
+
+
+### 4.State your conclusions and the assumptions needed for your conclusions.
+We can conclude saying that there is no correlation between supplement type and tooth growth. On the other hand while increasing the dosage of vitamin C we can see a growth in the guinea pig's teeth.
